@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SDR Ready — Gerador de Abordagem</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #F5EFE4; color: #1a1a1a; min-height: 100vh; padding: 2rem 1rem; }
+    .container { max-width: 680px; margin: 0 auto; }
+    .header { display: flex; align-items: center; gap: 14px; margin-bottom: 2rem; padding-bottom: 1.25rem; border-bottom: 2px solid #F4614A; }
+    .header-logo { font-size: 11px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; line-height: 1.3; }
+    .header-logo .line1 { color: #1A3C3A; }
+    .header-logo .line2 { color: #F4614A; }
+    .header-divider { width: 1px; height: 32px; background: #d9cfc4; }
+    .header-text h1 { font-size: 16px; font-weight: 700; color: #1A3C3A; margin-bottom: 2px; }
+    .header-text p { font-size: 12px; color: #888; }
+    .produto-banner { background: #1A3C3A; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 14px; }
+    .produto-icon { width: 40px; height: 40px; background: #F4614A; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .produto-info { flex: 1; }
+    .produto-nome { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+    .produto-desc { font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.5; }
+    .card { background: #fff; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; border: 1px solid #e8e0d6; border-top: 3px solid #F4614A; }
+    .section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: #F4614A; border-top: 1px solid #f0ebe4; padding-top: 1.25rem; margin-top: 1.25rem; margin-bottom: 1rem; }
+    .section-title:first-child { border-top: none; padding-top: 0; margin-top: 0; }
+    .field { margin-bottom: 1rem; }
+    .field:last-child { margin-bottom: 0; }
+    label { display: block; font-size: 13px; color: #555; margin-bottom: 6px; font-weight: 500; }
+    .field-note { font-size: 11px; color: #aaa; margin-top: 5px; line-height: 1.5; }
+    select, textarea, input[type="text"], input[type="url"] { width: 100%; padding: 10px 12px; font-size: 14px; background: #faf7f3; color: #1a1a1a; border: 1px solid #d9cfc4; border-radius: 8px; outline: none; font-family: inherit; transition: border-color 0.15s; }
+    select:focus, textarea:focus, input:focus { border-color: #F4614A; background: #fff; }
+    textarea { resize: vertical; line-height: 1.6; }
+    .source-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+    .tab-btn { padding: 6px 16px; font-size: 13px; font-weight: 600; border-radius: 8px; cursor: pointer; font-family: inherit; border: 1px solid #d9cfc4; background: transparent; color: #888; transition: all 0.15s; }
+    .tab-btn.active { background: #F4614A; color: #fff; border-color: #F4614A; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 480px) { .row { grid-template-columns: 1fr; } }
+    .btn-gerar { width: 100%; margin-top: 0.5rem; padding: 14px; background: #1A3C3A; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; transition: opacity 0.15s; letter-spacing: 0.01em; }
+    .btn-gerar:hover { opacity: 0.85; }
+    .btn-gerar:disabled { opacity: 0.4; cursor: default; }
+    .result-card { background: #fff; border: 1px solid #e8e0d6; border-radius: 12px; padding: 1.5rem; margin-top: 1.5rem; }
+    .result-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: #F4614A; margin-bottom: 8px; }
+    .result-section { margin-bottom: 1.25rem; }
+    .result-section:last-child { margin-bottom: 0; }
+    .divider { border: none; border-top: 1px solid #f0ebe4; margin: 1.25rem 0; }
+    .justif { font-size: 13px; color: #555; line-height: 1.6; }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag { font-size: 12px; padding: 4px 11px; border-radius: 99px; font-weight: 500; }
+    .tag-coral { background: #fde8e4; color: #a33020; }
+    .tag-dark { background: #e0e9e8; color: #1A3C3A; }
+    .msg-block { margin-bottom: 1.25rem; }
+    .msg-block:last-child { margin-bottom: 0; }
+    .msg-canal-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #1A3C3A; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+    .msg-canal-dot { width: 7px; height: 7px; border-radius: 50%; background: #F4614A; }
+    .msg-box { background: #faf7f3; border: 1px solid #e8e0d6; border-radius: 8px; padding: 1rem; font-size: 13.5px; line-height: 1.75; color: #1a1a1a; white-space: pre-wrap; }
+    .copy-btn { margin-top: 7px; padding: 5px 13px; background: transparent; border: 1px solid #d9cfc4; border-radius: 99px; font-size: 12px; cursor: pointer; color: #777; font-family: inherit; font-weight: 600; transition: all 0.15s; }
+    .copy-btn:hover { border-color: #F4614A; color: #F4614A; }
+    .source-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: #1A3C3A; font-weight: 600; background: #e0e9e8; padding: 3px 10px; border-radius: 6px; margin-bottom: 12px; }
+    .error-box { background: #fde8e4; color: #a33020; border-radius: 8px; padding: 1rem; font-size: 13px; line-height: 1.6; margin-top: 1rem; }
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .footer { text-align: center; margin-top: 2rem; font-size: 11px; color: #aaa; }
+    .footer span { color: #F4614A; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="header-logo">
+        <div class="line1">SDR</div>
+        <div class="line2">DE SUCESSO</div>
+      </div>
+      <div class="header-divider"></div>
+      <div class="header-text">
+        <h1>Gerador de Abordagem — SDR Ready</h1>
+        <p>Recrutamento e selecao de times de pre-vendas · Uso interno</p>
+      </div>
+    </div>
+    <div class="produto-banner">
+      <div class="produto-icon">🎯</div>
+      <div class="produto-info">
+        <div class="produto-nome">SDR Ready</div>
+        <div class="produto-desc">Selecao de talentos completa: divulgacao, triagem tecnica, fase pratica, 3 finalistas + treinamento e acompanhamento por 2 semanas</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-title">Contexto do prospect</div>
+      <div class="field">
+        <label>Como voce vai informar o contexto?</label>
+        <div class="source-tabs">
+          <button class="tab-btn active" id="tab-url" onclick="setTab('url')">Link do site</button>
+          <button class="tab-btn" id="tab-texto" onclick="setTab('texto')">Colar texto</button>
+          <button class="tab-btn" id="tab-ambos" onclick="setTab('ambos')">Ambos</button>
+        </div>
+      </div>
+      <div id="campo-url" class="field">
+        <label>URL do site do prospect</label>
+        <input type="url" id="url" placeholder="https://www.empresa.com.br" />
+        <p class="field-note">A ferramenta vai ler o site automaticamente e personalizar a abordagem com base no conteudo real.</p>
+      </div>
+      <div id="campo-texto" class="field" style="display:none;">
+        <label>Cole aqui o conteudo do prospect</label>
+        <textarea id="conteudo" style="min-height:90px;" placeholder="Cole texto da vaga, perfil do LinkedIn, descricao da empresa..."></textarea>
+      </div>
+      <div class="section-title">Job description (opcional)</div>
+      <div class="field">
+        <label>Cole o job description da vaga aberta <span style="color:#aaa;font-weight:400">(opcional)</span></label>
+        <textarea id="jobDescription" style="min-height:90px;" placeholder="Cole aqui a descricao completa da vaga de SDR/BDR que a empresa esta tentando preencher."></textarea>
+        <p class="field-note">Quando preenchido, a IA identifica os desafios especificos da vaga e usa como argumento central.</p>
+      </div>
+      <div class="section-title">Abordagem</div>
+      <div class="field">
+        <label>Persona que voce vai abordar</label>
+        <input type="text" id="persona" placeholder="Ex: Diretor Comercial em SaaS B2B, empresa com 50-200 funcionarios" />
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Canal da primeira abordagem</label>
+          <select id="canal">
+            <option value="LinkedIn (mensagem direta)">LinkedIn (mensagem direta)</option>
+            <option value="E-mail frio">E-mail frio</option>
+            <option value="WhatsApp">WhatsApp</option>
+            <option value="Ligacao (script)">Ligacao (script)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Objetivo</label>
+          <select id="objetivo">
+            <option value="Agendar conversa inicial">Agendar conversa inicial</option>
+            <option value="Apresentar o processo SDR Ready">Apresentar o processo SDR Ready</option>
+            <option value="Reativar lead frio">Reativar lead frio</option>
+            <option value="Enviar conteudo relevante">Enviar conteudo relevante</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Contexto adicional <span style="color:#aaa;font-weight:400">(opcional)</span></label>
+        <textarea id="contexto" style="min-height:60px;" placeholder="Ex: empresa ja errou na contratacao de SDR antes..."></textarea>
+      </div>
+      <button class="btn-gerar" id="btn" onclick="gerar()">Gerar abordagem completa + sequencia de follow-up</button>
+    </div>
+    <div id="result"></div>
+    <div class="footer">SDR de Sucesso · Raquel Carmo · <span>sdrdesucesso.com</span></div>
+  </div>
+  <script>
+    let tabAtual = 'url';
+    function setTab(tab) {
+      tabAtual = tab;
+      document.getElementById('tab-url').classList.toggle('active', tab === 'url' || tab === 'ambos');
+      document.getElementById('tab-texto').classList.toggle('active', tab === 'texto' || tab === 'ambos');
+      document.getElementById('tab-ambos').classList.toggle('active', tab === 'ambos');
+      document.getElementById('campo-url').style.display = (tab === 'url' || tab === 'ambos') ? 'block' : 'none';
+      document.getElementById('campo-texto').style.display = (tab === 'texto' || tab === 'ambos') ? 'block' : 'none';
+    }
+    async function gerar() {
+      const url = document.getElementById('url').value.trim();
+      const conteudo = document.getElementById('conteudo').value.trim();
+      const jobDescription = document.getElementById('jobDescription').value.trim();
+      const persona = document.getElementById('persona').value.trim();
+      const canal = document.getElementById('canal').value;
+      const objetivo = document.getElementById('objetivo').value;
+      const contexto = document.getElementById('contexto').value.trim();
+      if (!persona) { alert('Informe a persona que voce vai abordar.'); return; }
+      if (!url && !conteudo) { alert('Informe o link do site ou cole o conteudo do prospect.'); return; }
+      const btn = document.getElementById('btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Gerando sequencia completa...';
+      document.getElementById('result').innerHTML = '';
+      try {
+        const res = await fetch('/api/gerar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url, conteudo, jobDescription, persona, canal, objetivo, contexto })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Erro desconhecido');
+        renderResult(data, !!url, !!jobDescription);
+      } catch (e) {
+        document.getElementById('result').innerHTML = `<div class="error-box"><strong>Erro.</strong><br>${e.message}</div>`;
+      }
+      btn.disabled = false;
+      btn.innerHTML = 'Gerar abordagem completa + sequencia de follow-up';
+    }
+    function renderResult(d, leuSite, temJD) {
+      const sinais = (d.sinais_de_compra || []).map(s => `<span class="tag tag-coral">${s}</span>`).join('');
+      const dicas = (d.dicas_de_follow_up || []).map(s => `<span class="tag tag-dark">${s}</span>`).join('');
+      let badges = '';
+      if (leuSite) badges += `<div class="source-badge">Site do prospect lido automaticamente</div> `;
+      if (temJD) badges += `<div class="source-badge">Job description incluido na analise</div>`;
+      const canal = document.getElementById('canal').value;
+      const canalLabel = canal.includes('LinkedIn') ? 'LinkedIn' : canal.includes('mail') ? 'E-mail frio' : canal.includes('WhatsApp') ? 'WhatsApp' : 'Ligacao';
+      document.getElementById('result').innerHTML = `
+        <div class="result-card">
+          ${badges ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">${badges}</div>` : ''}
+          <div class="result-section">
+            <div class="result-label">Sinais de compra identificados</div>
+            <div class="tag-row">${sinais || '<span style="font-size:13px;color:#999">Nenhum identificado</span>'}</div>
+          </div>
+          <div class="result-section" style="margin-top:10px">
+            <div class="justif">${d.justificativa_fit || ''}</div>
+          </div>
+          <hr class="divider">
+          <div class="result-section">
+            <div class="result-label">Abordagem principal · ${canalLabel}</div>
+            <div class="msg-block">
+              <div class="msg-box" id="msg-principal">${d.abordagem_principal || ''}</div>
+              <button class="copy-btn" onclick="copiar('msg-principal', this)">Copiar</button>
+            </div>
+          </div>
+          <hr class="divider">
+          <div class="result-section">
+            <div class="result-label">Sequencia de follow-up</div>
+            <div class="msg-block">
+              <div class="msg-canal-label"><span class="msg-canal-dot"></span>Follow-up WhatsApp</div>
+              <div class="msg-box" id="msg-wpp">${d.followup_whatsapp || ''}</div>
+              <button class="copy-btn" onclick="copiar('msg-wpp', this)">Copiar</button>
+            </div>
+            <div class="msg-block">
+              <div class="msg-canal-label"><span class="msg-canal-dot"></span>E-mail 1</div>
+              <div class="msg-box" id="msg-e1">${d.email_1 || ''}</div>
+              <button class="copy-btn" onclick="copiar('msg-e1', this)">Copiar</button>
+            </div>
+            <div class="msg-block">
+              <div class="msg-canal-label"><span class="msg-canal-dot"></span>E-mail 2</div>
+              <div class="msg-box" id="msg-e2">${d.email_2 || ''}</div>
+              <button class="copy-btn" onclick="copiar('msg-e2', this)">Copiar</button>
+            </div>
+            <div class="msg-block">
+              <div class="msg-canal-label"><span class="msg-canal-dot"></span>E-mail 3 — Breakup</div>
+              <div class="msg-box" id="msg-e3">${d.email_3 || ''}</div>
+              <button class="copy-btn" onclick="copiar('msg-e3', this)">Copiar</button>
+            </div>
+          </div>
+          <hr class="divider">
+          <div class="result-section">
+            <div class="result-label">Dicas de follow-up para esse prospect</div>
+            <div class="tag-row">${dicas}</div>
+          </div>
+        </div>`;
+    }
+    function copiar(id, btn) {
+      const txt = document.getElementById(id)?.innerText;
+      if (txt) navigator.clipboard.writeText(txt).catch(() => {});
+      btn.textContent = 'Copiado!';
+      setTimeout(() => btn.textContent = 'Copiar', 2000);
+    }
+  </script>
+</body>
+</html>
